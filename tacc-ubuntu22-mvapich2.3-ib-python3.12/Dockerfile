@@ -1,7 +1,7 @@
 # Builds a Docker image for running FEniCS on TACC machines
 # The image is at:
 #
-#    https://hub.docker.com/r/uvilla/fenics-2019.1-tacc-mvapich2.3-ib
+#    https://hub.docker.com/u/gtpash/tacc-ubuntu22-mvapich2.3-ib-python3.12
 #
 # This is a modified version of 
 #    https://bitbucket.org/fenics-project/docker/src/master/dockerfiles/dev-env/Dockerfile 
@@ -14,12 +14,10 @@
 # Garth N. Wells <gnw20@cam.ac.uk>
 # Jan Blechta <blechta@karlin.mff.cuni.cz>
 
-FROM tacc/tacc-base:ubuntu22.04-mvapich2.3-ib
+FROM gtpash/tacc-ubuntu22-mvapich2.3-ib
 
 RUN useradd -m -s /bin/bash -G sudo fenics && \
     echo "fenics:docker" | chpasswd
-
-
 
 USER root
 WORKDIR /tmp
@@ -80,7 +78,7 @@ RUN apt-get -qq update && \
     wget https://www.python.org/ftp/python/3.12.4/Python-3.12.4.tgz && \
     tar xvf Python-3.12.4.tgz && \
     cd Python-3.12.4 && \
-    ./configure --enable-optimizations --with-lto --with-computed-gotos --with-system-ffi --enable-shared && \
+    ./configure --enable-optimizations --with-computed-gotos --with-system-ffi --enable-shared && \
     make && \
     make altinstall && \
     rm -rf Python-3.12.4.tgz Python-3.12.4
@@ -89,7 +87,7 @@ RUN ls /usr/local/lib/
 
 RUN python3 --version
 
-# Update Python from 3.6 to 3.12
+# Update Python to 3.12
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.12 1
 
 RUN ls /usr/local/lib
@@ -164,7 +162,7 @@ RUN apt-get -qq update && \
     cd slepc-src && \
     ./configure --prefix=/usr/local/slepc-32 && \
     make SLEPC_DIR=$(pwd) && \
-    make install && \
+    make SLEPC_DIR=$(pwd) PETSC_DIR=$PETSC_DIR install && \
     rm -rf /tmp/*
 
 # By default use the 32-bit build of SLEPc and PETSc.
@@ -209,11 +207,19 @@ ENV FENICS_BUILD_TYPE=Release
 ENV FENICS_SRC_DIR=/tmp/src
 ENV FENICS_PREFIX=/usr/local
 
-RUN /home/fenics/bin/fenics-pull && \
-    PIP_NO_CACHE_DIR=off \
-    /home/fenics/bin/fenics-build
+RUN ldconfig
 
-# symbol link ufl to ufl_legacy
-RUN ln -s /usr/local/lib/python3.12/site-packages/ufl_legacy /usr/local/lib/python3.12/site-packages/ufl
+RUN python3 -m pip install --upgrade pip setuptools wheel
+
+RUN python3 --version
+
+RUN g++ --version
+
+# RUN /home/fenics/bin/fenics-pull && \
+#     PIP_NO_CACHE_DIR=off \
+#     /home/fenics/bin/fenics-build
+
+# # symbol link ufl to ufl_legacy
+# RUN ln -s /usr/local/lib/python3.12/site-packages/ufl_legacy /usr/local/lib/python3.12/site-packages/ufl
 
 RUN ldconfig
