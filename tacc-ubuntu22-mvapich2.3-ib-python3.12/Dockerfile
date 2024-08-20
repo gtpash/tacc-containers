@@ -211,15 +211,11 @@ RUN ldconfig
 
 RUN python3 -m pip install --upgrade pip setuptools wheel
 
-RUN python3 --version
+RUN /home/fenics/bin/fenics-pull && \
+    PIP_NO_CACHE_DIR=off \
+    /home/fenics/bin/fenics-build
 
-RUN g++ --version
-
-# RUN /home/fenics/bin/fenics-pull && \
-#     PIP_NO_CACHE_DIR=off \
-#     /home/fenics/bin/fenics-build
-
-# # symbol link ufl to ufl_legacy
-# RUN ln -s /usr/local/lib/python3.12/site-packages/ufl_legacy /usr/local/lib/python3.12/site-packages/ufl
+# symbol link ufl to ufl_legacy
+RUN ln -s /usr/local/lib/python3.12/site-packages/ufl_legacy /usr/local/lib/python3.12/site-packages/ufl
 
 RUN ldconfig
