@@ -1,7 +1,7 @@
 # Builds a Docker image for running FEniCS on TACC machines
 # The image is at:
 #
-#    https://hub.docker.com/r/uvilla/fenics-2019.1-tacc-mvapich2.3-ib
+#    https://hub.docker.com/r/gtpash/tacc-ubuntu18-mvapich2.3-ib-python3.11
 #
 # This is a modified version of 
 #    https://bitbucket.org/fenics-project/docker/src/master/dockerfiles/dev-env/Dockerfile 
