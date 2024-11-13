@@ -83,23 +83,19 @@ RUN apt-get -qq update && \
     make altinstall && \
     rm -rf Python-3.11.9.tgz Python-3.11.9
 
-RUN ls /usr/local/lib/
-
-RUN python3 --version
-
 # Update Python from 3.6 to 3.11
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.11 1
-
-RUN ls /usr/local/lib
-RUN echo /usr/local/lib/python/3.11.9/lib > /etc/ld.so.conf.d/python.conf
 RUN ldconfig
-RUN python3 --version
 
 # Install setuptools
 RUN wget https://bootstrap.pypa.io/pip/get-pip.py && \
     python3 get-pip.py && \
     pip3 install --no-cache-dir setuptools && \
     rm -rf /tmp/*
+
+# Install NumPy / SciPy
+RUN pip3 install --no-cache-dir numpy==1.26 && \
+    pip3 install --no-cache-dir scipy
 
 # Install PETSc from source
 RUN apt-get -qq update && \
@@ -123,6 +119,8 @@ RUN apt-get -qq update && \
                 --download-spai \
                 --download-suitesparse \
                 --download-superlu \
+                --download-zlib \
+                --download-szlib \
                 --download-hdf5\
                 --download-strumpack \
                 --download-ml \
